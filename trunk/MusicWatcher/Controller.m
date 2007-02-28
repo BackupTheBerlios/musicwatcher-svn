@@ -53,6 +53,7 @@
 	
 	for(i = 0; i < count; i++) {
 		NSArray* fftResult;
+		
 		[volumeGraph addXData:[[chunks objectAtIndex:i] channel:0]];
 		
 		fftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:0]];
