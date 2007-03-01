@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2F0DC2260B9578E100AB8381 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F0DC2250B9578E100AB8381 /* Carbon.framework */; };
+		2F3198DE0B96A21B0037E785 /* FFTEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F3198DD0B96A21B0037E785 /* FFTEngine.m */; };
 		2F4AC6670B94DCFA00C552AD /* Controller.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F4AC6660B94DCFA00C552AD /* Controller.m */; };
 		2F4AC6A30B94E22C00C552AD /* VirtualRingBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F4AC6A20B94E22C00C552AD /* VirtualRingBuffer.m */; };
 		2F4AC6A60B94E23600C552AD /* QTSoundFilePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F4AC6A50B94E23600C552AD /* QTSoundFilePlayer.m */; };
@@ -22,6 +23,8 @@
 		2F61BDA60B9529EB00A9AF00 /* FFTW3.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F61BDA50B9529EB00A9AF00 /* FFTW3.framework */; };
 		2F61BDAF0B952C1B00A9AF00 /* FFTW.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F61BDAE0B952C1B00A9AF00 /* FFTW.m */; };
 		2F61BE5D0B95371100A9AF00 /* BarGrapher.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F61BE5C0B95371100A9AF00 /* BarGrapher.m */; };
+		2F86E0960B967B8500404515 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F86E08D0B967B8500404515 /* Accelerate.framework */; };
+		2F86E09B0B967BB400404515 /* FFT.m in Sources */ = {isa = PBXBuildFile; fileRef = 2F86E09A0B967BB400404515 /* FFT.m */; };
 		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
@@ -37,6 +40,8 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		2F0DC2250B9578E100AB8381 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		2F3198DC0B96A21B0037E785 /* FFTEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFTEngine.h; sourceTree = "<group>"; };
+		2F3198DD0B96A21B0037E785 /* FFTEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FFTEngine.m; sourceTree = "<group>"; };
 		2F4AC6650B94DCFA00C552AD /* Controller.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		2F4AC6660B94DCFA00C552AD /* Controller.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Controller.m; sourceTree = "<group>"; };
 		2F4AC6A10B94E22C00C552AD /* VirtualRingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VirtualRingBuffer.h; sourceTree = "<group>"; };
@@ -55,11 +60,14 @@
 		2F4AC9AD0B9518B500C552AD /* Grapher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = Grapher.m; sourceTree = "<group>"; };
 		2F4AC9AF0B9518DA00C552AD /* MovingLineGrapher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = MovingLineGrapher.h; sourceTree = "<group>"; };
 		2F4AC9B00B9518DB00C552AD /* MovingLineGrapher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = MovingLineGrapher.m; sourceTree = "<group>"; };
-		2F61BDA50B9529EB00A9AF00 /* FFTW3.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FFTW3.framework; path = /Library/Frameworks/FFTW3.framework; sourceTree = "<absolute>"; };
+		2F61BDA50B9529EB00A9AF00 /* FFTW3.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = FFTW3.framework; path = /Library/Frameworks/FFTW3.framework; sourceTree = "<absolute>"; };
 		2F61BDAD0B952C1B00A9AF00 /* FFTW.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFTW.h; sourceTree = "<group>"; };
 		2F61BDAE0B952C1B00A9AF00 /* FFTW.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FFTW.m; sourceTree = "<group>"; };
 		2F61BE5B0B95371100A9AF00 /* BarGrapher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = BarGrapher.h; sourceTree = "<group>"; };
 		2F61BE5C0B95371100A9AF00 /* BarGrapher.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = BarGrapher.m; sourceTree = "<group>"; };
+		2F86E08D0B967B8500404515 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = /System/Library/Frameworks/Accelerate.framework; sourceTree = "<absolute>"; };
+		2F86E0990B967BB400404515 /* FFT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FFT.h; sourceTree = "<group>"; };
+		2F86E09A0B967BB400404515 /* FFT.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FFT.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MusicWatcher_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicWatcher_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MusicWatcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MusicWatcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +85,7 @@
 				2F4AC7190B94E47300C552AD /* QuickTime.framework in Frameworks */,
 				2F61BDA60B9529EB00A9AF00 /* FFTW3.framework in Frameworks */,
 				2F0DC2260B9578E100AB8381 /* Carbon.framework in Frameworks */,
+				2F86E0960B967B8500404515 /* Accelerate.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +95,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				2F3198DC0B96A21B0037E785 /* FFTEngine.h */,
+				2F3198DD0B96A21B0037E785 /* FFTEngine.m */,
 				2F61BE5B0B95371100A9AF00 /* BarGrapher.h */,
 				2F61BE5C0B95371100A9AF00 /* BarGrapher.m */,
 				2F4AC9AF0B9518DA00C552AD /* MovingLineGrapher.h */,
@@ -102,6 +113,8 @@
 				2F4AC91A0B950F1100C552AD /* AudioChunk.m */,
 				2F61BDAD0B952C1B00A9AF00 /* FFTW.h */,
 				2F61BDAE0B952C1B00A9AF00 /* FFTW.m */,
+				2F86E0990B967BB400404515 /* FFT.h */,
+				2F86E09A0B967BB400404515 /* FFT.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -168,6 +181,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2F86E08D0B967B8500404515 /* Accelerate.framework */,
 				2F0DC2250B9578E100AB8381 /* Carbon.framework */,
 				2F61BDA50B9529EB00A9AF00 /* FFTW3.framework */,
 				2F4AC7120B94E47300C552AD /* CoreAudio.framework */,
@@ -243,6 +257,8 @@
 				2F4AC9B10B9518DB00C552AD /* MovingLineGrapher.m in Sources */,
 				2F61BDAF0B952C1B00A9AF00 /* FFTW.m in Sources */,
 				2F61BE5D0B95371100A9AF00 /* BarGrapher.m in Sources */,
+				2F86E09B0B967BB400404515 /* FFT.m in Sources */,
+				2F3198DE0B96A21B0037E785 /* FFTEngine.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,18 +6,22 @@
 #import "SampleBuffer.h"
 #import "MovingLineGrapher.h"
 #import "BarGrapher.h"
+#import "FFTEngine.h"
+#import "FFT.h"
 #import "FFTW.h"
 
 @interface Controller : NSObject
 {
     IBOutlet NSTextField* fileDisplay;
 	IBOutlet MovingLineGrapher* volumeGraph;
-	IBOutlet BarGrapher* spectrumGraph;
+	IBOutlet BarGrapher* leftSpectrumGraph;
+	IBOutlet BarGrapher* rightSpectrumGraph;
+	IBOutlet NSWindow* mainWindow;
 	
 	QTSoundFilePlayer* ourPlayer;
 	SampleBuffer* sampleBuffer;
 	NSTimer* interfaceUpdateTimer;
-	FFTW* ourFFT;
+	FFTEngine* ourFFT;
 	
 }
 - (IBAction)pauseButton:(id)sender;

@@ -8,7 +8,7 @@
 
 #import "MovingLineGrapher.h"
 
-#define GRAPH_WIDTH 2048
+#define GRAPH_WIDTH 4096
 
 @implementation MovingLineGrapher
 

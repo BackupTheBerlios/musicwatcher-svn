@@ -7,7 +7,9 @@
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fileDisplay = NSTextField; 
-                spectrumGraph = BarGrapher; 
+                leftSpectrumGraph = BarGrapher; 
+                mainWindow = NSWindow; 
+                rightSpectrumGraph = BarGrapher; 
                 volumeGraph = MovingLineGrapher; 
             }; 
             SUPERCLASS = NSObject; 

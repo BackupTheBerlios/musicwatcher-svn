@@ -1,46 +1,41 @@
 //
-//  FFTW.m
+//  FFT.m
 //  MusicWatcher
 //
-//  Created by Tyler Riddle on 2/27/07.
+//  Created by Tyler Riddle on 2/28/07.
 //  Copyright 2007 Tyler Riddle. All rights reserved.
 //
 
-#include <math.h>
+//not sure why this isn't working correctly
 
-#import "FFTW.h"
+#import <math.h>
 
-#define LOW_PASS_FILTER 10000
+#import "FFT.h"
 
-//tested by running some audio through the system, may not be accurate
-#define HARD_SCALE 50 
+NSMutableArray* makeMagnitudes(float*, int);
+float solveOneA(float);
 
-static NSArray* makeMagnitudes(fftw_complex*, int, NSArray*, int);
-static float solveOneA(float);
+@implementation FFT
 
-@implementation FFTW
-
--(id)initWithFFTSize:(int)size sampleRate:(int)rate {
+-(id) initWithFFTSize:(int)size sampleRate:(int)rate {
 	self = [self init];
 	
-	maxReading = 0.0;
-	fftSize = size;
 	sampleRate = rate;
+	fftSize = 512; //FIXME - WTF is this returning 511? exp2(size);
+	fftSizeDamnApple = size;
 	
-	fftInput = fftw_malloc(sizeof(double) * fftSize);
-	fftResult = fftw_malloc(sizeof(fftw_complex) * fftSize);
-	
-	if (fftInput == NULL) {
-		NSLog(@"could not malloc fftInput");
+	A.realp = (float*) malloc(fftSize / 2 * sizeof(float));
+	A.imagp = (float*) malloc(fftSize / 2 * sizeof(float));
+	originalReal = ( float* ) malloc ( fftSize * sizeof (float));
+	obtainedReal = ( float* ) malloc ( fftSize * sizeof (float));
+
+	if ( originalReal == NULL || A.realp == NULL || A.imagp ==  NULL  )
+	{
+		NSLog(@"could not malloc data for FFT");
 		[NSApp terminate];
 	}
 	
-	if (fftResult == NULL) {
-		NSLog(@"could not malloc fftResult");
-		[NSApp terminate];
-	}
-	
-	fftPlan = fftw_plan_dft_r2c_1d(fftSize, fftInput, fftResult, FFTW_MEASURE);
+	fftSetup = vDSP_create_fftsetup ( fftSizeDamnApple, FFT_RADIX2);
 	
 	[self makeScaleValues];
 	
@@ -48,15 +43,11 @@ static float solveOneA(float);
 }
 
 -(void) dealloc {
-	fftw_destroy_plan(fftPlan);
-	
-	if (fftInput != nil) {
-		fftw_free(fftInput);
-	}
-
-	if (fftResult != nil) {
-		fftw_free(fftResult);
-	}
+	vDSP_destroy_fftsetup(fftSetup);
+	free ( obtainedReal );
+	free ( originalReal );
+	free ( A.realp );
+	free ( A.imagp );
 	
 	[super dealloc];
 }
@@ -69,32 +60,56 @@ static float solveOneA(float);
 		int oneValue = (float)i / fftSize * sampleRate;
 		[freqs addObject:[NSNumber numberWithInt:oneValue]];
 	}
-		
+	
 	return freqs;
 }
 
 -(NSArray*)doEasyFFT:(NSArray *)samples {
 	NSMutableArray *retVal;
+	//why doesn't the apple suplied example work?
+	//float scale = (float)1.0/(2*fftSize);
+	float scale = (float)1.0/(4*fftSizeDamnApple);
 	int i;
+	int borked = 0;
 	
 	if ([samples count] != fftSize) {
 		NSLog(@"FFTW: sample count of %i was not %i", [samples count], fftSize);
 		return nil;
 	}
+
+	//NSLog(@"here %i", borked++);
 	
-	for(i = 0; i < fftSize; i++) {
-		fftInput[i] = [[samples objectAtIndex:i] doubleValue];
+	for(i = 0; i < fftSize; i += 2) {
+		originalReal[i] = [[samples objectAtIndex:i] floatValue];
 	}
 	
-	fftw_execute(fftPlan);
+	//NSLog(@"here %i", borked++);
 	
-	//FIME this shouldn't call ourselves to get the freqs but filtering shouldn't be here anyway
-	retVal = makeMagnitudes(fftResult, fftSize / 2 + 1, [self frequencies], LOW_PASS_FILTER);
+	vDSP_ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, fftSize / 2 );
 	
+	//NSLog(@"here %i", borked++);
+
+	
+	vDSP_fft_zrip ( fftSetup, &A, 1, fftSizeDamnApple, FFT_FORWARD );
+	
+	//NSLog(@"here %i", borked++);
+	
+	vDSP_vsmul( A.realp, 1, &scale, A.realp, 1, fftSize / 2 );
+	vDSP_vsmul( A.imagp, 1, &scale, A.imagp, 1, fftSize / 2 );
+	//NSLog(@"here %i", borked++);
+	
+	
+	//FIXME - this might be wrong
+	vDSP_ztoc ( &A, 1, ( COMPLEX * ) obtainedReal, 2, fftSize / 2 );
+	//NSLog(@"here %i", borked++);
+	
+	retVal = makeMagnitudes(obtainedReal, fftSize);
+	//NSLog(@"here %i", borked++);
+
 	[self scale:retVal];
-	
+
 	return retVal;
-}
+}	
 
 -(void) makeScaleValues {
 	NSArray* freqs = [self frequencies];
@@ -107,28 +122,27 @@ static float solveOneA(float);
 		float freq = [[freqs objectAtIndex:i] floatValue];
 		float correction = solveOneA(freq);
 		
-		//NSLog(@"correction is: %f", correction);
+		//NSLog(@"correction is: %f freq is %f", correction, freq);
 		
 		if (freq < 10000) {
 			[scaleValues addObject:[NSNumber numberWithFloat:correction]];
 		} else {
 			[scaleValues addObject:[NSNumber numberWithFloat:1.0]];
 		}
-				
+		
 	}
 }
 
 -(void) scale:(NSMutableArray*)data {
 	int count = [data count];
 	int i;
-
+	
 	for(i = 0; i < count; i++) {
 		float correction = [[scaleValues objectAtIndex:i] floatValue];
 		float oneValue = [[data objectAtIndex:i] floatValue];
 		float newValue;
 		
-		newValue = oneValue / (float)HARD_SCALE;
-		newValue = newValue * correction;
+		newValue = oneValue * correction;
 		
 		//NSLog(@"one: %f new: %f correction: %f", oneValue, newValue, correction);
 		
@@ -138,21 +152,15 @@ static float solveOneA(float);
 	}
 }
 
+
 @end
 
-static NSArray* makeMagnitudes(fftw_complex* result, int size, NSArray* freqs, int lowPassFilter) {
+NSMutableArray* makeMagnitudes(float* result, int size) {
 	NSMutableArray* retVal = [[[NSMutableArray alloc] init] autorelease];
 	int i;
-		
-	for(i = 0; i < size; i++) {
-		double oneResult; 
-		int freq = [[freqs objectAtIndex:i] intValue];
-		
-		if (freq > lowPassFilter) {
-			break;
-		}
-		
-		oneResult = sqrt((result[i][0] * result[i][0]) + (result[i][1] * result[i][1]));
+	
+	for(i = 0; i < size; i += 2) {
+		double oneResult = sqrt((result[i] * result[i]) + (result[i + 1] * result[i + 1]));
 		
 		[retVal addObject:[NSNumber numberWithDouble:oneResult]];
 	}
@@ -160,12 +168,13 @@ static NSArray* makeMagnitudes(fftw_complex* result, int size, NSArray* freqs, i
 	return retVal;
 }
 
-static float solveOneA(float freq) {
+float solveOneA(float freq) {
 	float term1 = (freq * freq) + (20.6 * 20.6);
 	float term2 = (freq * freq) + + (12200.0 * 12200.0);
 	float term3 = sqrt((freq * freq) + (107.7 * 107.7));
 	float term4 = sqrt((freq * freq) + (737.9 * 737.9));
 	float answer = (12200.0 * 12200.0) * (freq * freq * freq * freq) / (term1 * term2 * term3 * term4);
-		
+	
 	return answer;
 }
+

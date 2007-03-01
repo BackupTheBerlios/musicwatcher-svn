@@ -1,17 +1,17 @@
 #import "Controller.h"
 
 #define FRAMES_PER_SECOND 30
+//FFT_SIZE is in powers of 2
+//for the apple FFT
+//#define FFT_SIZE 9
+//for FFTW
 #define FFT_SIZE 512
+
+NSArray* mean(NSArray *);
 
 @implementation Controller
 
 - (void)awakeFromNib {
-	[[NSApp mainWindow] registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
-	[[NSApp mainWindow] setDelegate:self];
-	
-	if ([NSApp mainWindow] == nil) {
-		NSLog(@"ah ha");
-	}
 	
 	sampleBuffer = [[SampleBuffer alloc] init];
 
@@ -19,6 +19,14 @@
 	
 	//FIME - this won't always be 44100
 	ourFFT = [[FFTW alloc] initWithFFTSize:FFT_SIZE sampleRate:44100];
+}
+
+- (void) applicationDidFinishLaunching:(NSNotification *)notification {
+	
+	[mainWindow setDelegate:self];
+	[mainWindow registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+	
+	[fileDisplay unregisterDraggedTypes];
 }
 
 //actions
@@ -41,25 +49,31 @@
 - (void)fileDropped:(id)notification {
 	NSString* file = [notification userInfo];
 	[fileDisplay setStringValue:file];
-	
-	NSLog(@"got a file drop: %@", file);
 }
 
 //timers
 - (void)updateUI:(NSTimer *)theTimer {	
 	NSArray* chunks = [sampleBuffer getAudioChunks];
+	NSMutableArray* leftFftValues = [[[NSMutableArray alloc] init] autorelease];
+	NSMutableArray* rightFftValues = [[[NSMutableArray alloc] init] autorelease];
 	int count = [chunks count];
 	int i;
 	
 	for(i = 0; i < count; i++) {
-		NSArray* fftResult;
+		NSArray* leftFftResult;
+		NSArray* rightFftResult;
 		
-		[volumeGraph addXData:[[chunks objectAtIndex:i] channel:0]];
+		[volumeGraph addXData:[[chunks objectAtIndex:i] mix]];
 		
-		fftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:0]];
+		leftFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:0]];
+		rightFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:1]];
 		
-		[spectrumGraph setXData:fftResult];
+		[leftFftValues addObject:leftFftResult];
+		[rightFftValues addObject:rightFftResult];
 	}
+	
+	[leftSpectrumGraph setXData:mean(leftFftValues)];
+	[rightSpectrumGraph setXData:mean(rightFftValues)];
 }
 
 //delegation
@@ -144,3 +158,24 @@
 }
 
 @end
+
+NSArray* mean(NSArray *arrays) {
+	NSMutableArray* retVal = [[[NSMutableArray alloc] init] autorelease];
+	int count = [[arrays objectAtIndex:0] count];
+	int numArrays = [arrays count];
+	int i, j;
+	
+	for(i = 0; i < count; i++) {
+		float sum = 0;
+		
+		for(j = 0; j < numArrays; j++) {
+			sum += [[[arrays objectAtIndex:j] objectAtIndex:i] floatValue];
+		}
+		
+		sum = sum / numArrays;
+		
+		[retVal addObject:[NSNumber numberWithFloat:sum]];
+	}
+	
+	return retVal;
+}
