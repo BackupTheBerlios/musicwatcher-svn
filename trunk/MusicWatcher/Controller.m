@@ -3,9 +3,9 @@
 #define FRAMES_PER_SECOND 30
 //FFT_SIZE is in powers of 2
 //for the apple FFT
-//#define FFT_SIZE 9
+#define FFT_SIZE 9
 //for FFTW
-#define FFT_SIZE 512
+//#define FFT_SIZE 512
 
 NSArray* mean(NSArray *);
 
@@ -18,7 +18,7 @@ NSArray* mean(NSArray *);
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDropped:) name:@"FileDrop" object:nil];
 	
 	//FIME - this won't always be 44100
-	ourFFT = [[FFTW alloc] initWithFFTSize:FFT_SIZE sampleRate:44100];
+	ourFFT = [[FFT alloc] initWithFFTSize:FFT_SIZE sampleRate:44100];
 	
 	stopRequested = NO;
 }
@@ -29,7 +29,7 @@ NSArray* mean(NSArray *);
 	[mainWindow registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 	[mainWindow setAcceptsMouseMovedEvents:YES];
 	
-	[fileDisplay unregisterDraggedTypes];
+	[fileDisplay setStringValue:@""];
 	
 	[stopButton setEnabled:NO];
 	[pauseButton setEnabled:NO];
