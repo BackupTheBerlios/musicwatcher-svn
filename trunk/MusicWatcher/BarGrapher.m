@@ -29,17 +29,14 @@ void zeroArray(NSMutableArray*, int);
 	[super dealloc];
 }
 
--(void)setYMax:(float)maxValue {
-	NSLog(@"setting new max to %f", maxValue);
-	yMax = maxValue;
-}
 
 - (void)drawRect:(NSRect)viewArea {
+	float leftOffset = [self leftDrawingOffset];
 	int dataSize = [xData count];
-	int fullWidth = viewArea.size.width / dataSize;
+	float fullWidth = (viewArea.size.width - leftOffset) / dataSize;
 	float barWidth = fullWidth - (fullWidth * BAR_SPACING * 2);
 	int i = 0;
-		
+			
 	[super drawRect:viewArea];
 		
 	[[NSColor whiteColor] set];
@@ -51,7 +48,7 @@ void zeroArray(NSMutableArray*, int);
 	for(; i < dataSize; i++) {
 		float dataPoint = [[xData objectAtIndex:i] floatValue] / yMax;
 		NSNumber* peakValue = [peakValues objectAtIndex:i];
-		float x0 = (i * fullWidth) + barWidth / 8;
+		float x0 = (i * fullWidth) + barWidth / 8 + leftOffset;
 		float height = dataPoint * viewArea.size.height;
 		float peakHeight = viewArea.size.height * PEAK_VERTICAL_SIZE;
 		float peakBottom;
@@ -77,6 +74,10 @@ void zeroArray(NSMutableArray*, int);
 		newPeak = [peakValue floatValue] - PEAK_FALL;
 		
 		[peakValues replaceObjectAtIndex:i withObject:[NSNumber numberWithFloat:newPeak]];
+	}
+	
+	if (showAdjuster){
+		[self drawAdjuster];
 	}
 }
 

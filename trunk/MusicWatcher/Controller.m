@@ -27,11 +27,13 @@ NSArray* mean(NSArray *);
 	
 	[mainWindow setDelegate:self];
 	[mainWindow registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+	[mainWindow setAcceptsMouseMovedEvents:YES];
 	
 	[fileDisplay unregisterDraggedTypes];
 	
 	[stopButton setEnabled:NO];
 	[pauseButton setEnabled:NO];
+	[playPosition setEnabled:NO];
 }
 
 //actions
@@ -50,13 +52,9 @@ NSArray* mean(NSArray *);
 	[self stopPlaying];
 }
 
--(IBAction)graphScale:(id)sender {
-	float newScale = [sender floatValue];
-	
-	[leftSpectrumGraph setYMax:newScale];
-	[rightSpectrumGraph setYMax:newScale];
-	
-	NSLog(@"hrm: %f", newScale);
+-(IBAction)playPosition:(id)sender {
+	NSLog(@"requested seek to %f", [sender floatValue]);
+	[ourPlayer setPlaybackPosition:[sender floatValue]];
 }
 
 //notifications
@@ -88,6 +86,8 @@ NSArray* mean(NSArray *);
 	
 	[leftSpectrumGraph setXData:mean(leftFftValues)];
 	[rightSpectrumGraph setXData:mean(rightFftValues)];
+	
+	[playPosition setFloatValue:[ourPlayer playbackPosition]];
 }
 
 //delegation
@@ -147,13 +147,19 @@ NSArray* mean(NSArray *);
 	
 	[ourPlayer setDelegate:self];
 	
-	[ourPlayer play];
-	
 	interfaceUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:span target:self selector:@selector(updateUI:) userInfo:nil repeats:YES];
 	
+	[ourPlayer play];
+	
+	[playPosition setMaxValue:[ourPlayer duration]];
+	
+	NSLog(@"duration is %f", [ourPlayer duration]);
+		
 	[playButton setEnabled:NO];
 	[stopButton setEnabled:YES];
 	[pauseButton setEnabled:YES];
+	[playPosition setEnabled:YES];
+
 }
 
 - (void)stopPlaying {
@@ -175,9 +181,12 @@ NSArray* mean(NSArray *);
 	
 	stopRequested = NO;
 	
+	[playPosition setFloatValue:0];
+	
 	[playButton setEnabled:YES];
 	[stopButton setEnabled:NO];
 	[pauseButton setEnabled:NO];
+	[playPosition setEnabled:NO];
 }
 
 - (void)pausePlaying {

@@ -12,9 +12,6 @@
 
 @interface BarGrapher : Grapher {
 	NSMutableArray* peakValues;
-	float yMax;
 }
-
--(void)setYMax:(float)newMax;
 
 @end

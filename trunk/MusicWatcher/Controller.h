@@ -20,6 +20,7 @@
 	IBOutlet NSButton* pauseButton;
 	IBOutlet NSButton* playButton;
 	IBOutlet NSButton* stopButton;
+	IBOutlet NSSlider* playPosition;
 	
 	QTSoundFilePlayer* ourPlayer;
 	SampleBuffer* sampleBuffer;
@@ -32,5 +33,5 @@
 - (IBAction)pauseButton:(id)sender;
 - (IBAction)playButton:(id)sender;
 - (IBAction)stopButton:(id)sender;
-- (IBAction)graphScale:(id)sender;
+- (IBAction)playPosition:(id)sender;
 @end
