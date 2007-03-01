@@ -2,14 +2,17 @@
     IBClasses = (
         {CLASS = BarGrapher; LANGUAGE = ObjC; SUPERCLASS = Grapher; }, 
         {
-            ACTIONS = {pauseButton = id; playButton = id; stopButton = id; }; 
+            ACTIONS = {graphScale = id; pauseButton = id; playButton = id; stopButton = id; }; 
             CLASS = Controller; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fileDisplay = NSTextField; 
                 leftSpectrumGraph = BarGrapher; 
                 mainWindow = NSWindow; 
+                pauseButton = NSButton; 
+                playButton = NSButton; 
                 rightSpectrumGraph = BarGrapher; 
+                stopButton = NSButton; 
                 volumeGraph = MovingLineGrapher; 
             }; 
             SUPERCLASS = NSObject; 

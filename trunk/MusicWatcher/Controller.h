@@ -17,14 +17,20 @@
 	IBOutlet BarGrapher* leftSpectrumGraph;
 	IBOutlet BarGrapher* rightSpectrumGraph;
 	IBOutlet NSWindow* mainWindow;
+	IBOutlet NSButton* pauseButton;
+	IBOutlet NSButton* playButton;
+	IBOutlet NSButton* stopButton;
 	
 	QTSoundFilePlayer* ourPlayer;
 	SampleBuffer* sampleBuffer;
 	NSTimer* interfaceUpdateTimer;
 	FFTEngine* ourFFT;
+	BOOL stopRequested;
+	float graphScale;
 	
 }
 - (IBAction)pauseButton:(id)sender;
 - (IBAction)playButton:(id)sender;
 - (IBAction)stopButton:(id)sender;
+- (IBAction)graphScale:(id)sender;
 @end

@@ -9,8 +9,30 @@
 #import "BarGrapher.h"
 
 #define BAR_SPACING .1
+#define PEAK_VERTICAL_SIZE .01
+#define PEAK_FALL .005
+
+void zeroArray(NSMutableArray*, int);
 
 @implementation BarGrapher
+
+-(void) awakeFromNib {
+	peakValues = [[NSMutableArray alloc] init];
+	yMax = 1.0;
+}
+
+-(void) dealloc {
+	if (peakValues != nil) {
+		[peakValues release];
+	}
+	
+	[super dealloc];
+}
+
+-(void)setYMax:(float)maxValue {
+	NSLog(@"setting new max to %f", maxValue);
+	yMax = maxValue;
+}
 
 - (void)drawRect:(NSRect)viewArea {
 	int dataSize = [xData count];
@@ -22,17 +44,49 @@
 		
 	[[NSColor whiteColor] set];
 	
-	for(; i < dataSize; i++) {
-		NSNumber* dataPoint = [xData objectAtIndex:i];
-		float x0 = (i * fullWidth) + barWidth / 8;
-		float huh = [dataPoint floatValue];
-		float height = huh * viewArea.size.height;
-		NSRect rect = NSMakeRect(x0, 0, barWidth, height);
-		NSRectFill(rect);
-		
-		//NSLog(@"stuff: %f %f %f", x0, barWidth, height);
+	if ([peakValues count] < dataSize) {
+		zeroArray(peakValues, dataSize);
 	}
 	
+	for(; i < dataSize; i++) {
+		float dataPoint = [[xData objectAtIndex:i] floatValue] / yMax;
+		NSNumber* peakValue = [peakValues objectAtIndex:i];
+		float x0 = (i * fullWidth) + barWidth / 8;
+		float height = dataPoint * viewArea.size.height;
+		float peakHeight = viewArea.size.height * PEAK_VERTICAL_SIZE;
+		float peakBottom;
+		float newPeak;
+		NSRect bar;
+		NSRect peak;
+		
+		//NSLog(@"ymax is %f", yMax);
+		
+		if (dataPoint > [peakValue floatValue]) {
+			peakValue = [NSNumber numberWithFloat:dataPoint];
+			[peakValues replaceObjectAtIndex:i withObject:peakValue];
+		}		
+		
+		peakBottom = [peakValue floatValue] * viewArea.size.height - peakHeight;
+		
+		bar = NSMakeRect(x0, 0, barWidth, height);
+		peak = NSMakeRect(x0, peakBottom, barWidth, peakHeight);
+		
+		NSRectFill(bar);
+		NSRectFill(peak);
+		
+		newPeak = [peakValue floatValue] - PEAK_FALL;
+		
+		[peakValues replaceObjectAtIndex:i withObject:[NSNumber numberWithFloat:newPeak]];
+	}
 }
 
 @end
+
+void zeroArray(NSMutableArray* theArray, int count) {
+	int toAdd = count - [theArray count];
+	int i;
+	
+	for(i = 0; i < toAdd; i++) {
+		[theArray addObject:[NSNumber numberWithInt:0]];
+	}
+}

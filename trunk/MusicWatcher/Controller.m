@@ -19,6 +19,8 @@ NSArray* mean(NSArray *);
 	
 	//FIME - this won't always be 44100
 	ourFFT = [[FFTW alloc] initWithFFTSize:FFT_SIZE sampleRate:44100];
+	
+	stopRequested = NO;
 }
 
 - (void) applicationDidFinishLaunching:(NSNotification *)notification {
@@ -27,6 +29,9 @@ NSArray* mean(NSArray *);
 	[mainWindow registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 	
 	[fileDisplay unregisterDraggedTypes];
+	
+	[stopButton setEnabled:NO];
+	[pauseButton setEnabled:NO];
 }
 
 //actions
@@ -43,6 +48,15 @@ NSArray* mean(NSArray *);
 - (IBAction)stopButton:(id)sender
 {
 	[self stopPlaying];
+}
+
+-(IBAction)graphScale:(id)sender {
+	float newScale = [sender floatValue];
+	
+	[leftSpectrumGraph setYMax:newScale];
+	[rightSpectrumGraph setYMax:newScale];
+	
+	NSLog(@"hrm: %f", newScale);
 }
 
 //notifications
@@ -80,9 +94,9 @@ NSArray* mean(NSArray *);
 
 //QTSoundFilePlayer delegation
 - (void)qtSoundFilePlayer:(QTSoundFilePlayer *)player didFinishPlaying:(BOOL)aBool {
-	[interfaceUpdateTimer invalidate];
-	
-	interfaceUpdateTimer = nil;
+	if (! stopRequested) {
+		[self stopPlaying];
+	}
 }
 
 - (void)qtSoundFilePlayer:(QTSoundFilePlayer *)Player didPlayAudioBuffer:(AudioBuffer *)buffer {
@@ -126,11 +140,20 @@ NSArray* mean(NSArray *);
 	
 	ourPlayer = [[QTSoundFilePlayer alloc] initWithContentsOfFile:file];
 	
+	if (ourPlayer == nil) {
+		NSLog(@"QTSoundFilePlayer returned nil");
+		return;
+	}
+	
 	[ourPlayer setDelegate:self];
 	
 	[ourPlayer play];
 	
 	interfaceUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:span target:self selector:@selector(updateUI:) userInfo:nil repeats:YES];
+	
+	[playButton setEnabled:NO];
+	[stopButton setEnabled:YES];
+	[pauseButton setEnabled:YES];
 }
 
 - (void)stopPlaying {
@@ -138,11 +161,23 @@ NSArray* mean(NSArray *);
 		return;
 	}
 	
+	stopRequested = YES;
+	
 	[ourPlayer stop];
 	
 	[ourPlayer autorelease];
 	
 	ourPlayer = nil;
+	
+	[interfaceUpdateTimer invalidate];
+	
+	interfaceUpdateTimer = nil;	
+	
+	stopRequested = NO;
+	
+	[playButton setEnabled:YES];
+	[stopButton setEnabled:NO];
+	[pauseButton setEnabled:NO];
 }
 
 - (void)pausePlaying {
@@ -152,8 +187,10 @@ NSArray* mean(NSArray *);
 	
 	if ([ourPlayer isPaused]) {
 		[ourPlayer resume];
+		[pauseButton setTitle:@"Pause"];
 	} else {
 		[ourPlayer pause];
+		[pauseButton setTitle:@"Resume"];
 	}
 }
 
