@@ -6,13 +6,16 @@
 //  Copyright 2007 Tyler Riddle. All rights reserved.
 //
 
-//not sure why this isn't working correctly
+//not sure why this isn't working correctly - the FFT is giving the data below the center mirrored on the data above the center - low pass filtering solves this for now
 
 #import <math.h>
 
 #import "FFT.h"
 
-NSMutableArray* makeMagnitudes(float*, int);
+//even the low pass filter isn't working right! this is really filtering at 10k
+#define LOW_PASS_FILTER 20000
+
+NSMutableArray* makeMagnitudes(float*, int, NSArray*, int);
 float solveOneA(float);
 
 @implementation FFT
@@ -103,7 +106,7 @@ float solveOneA(float);
 	vDSP_ztoc ( &A, 1, ( COMPLEX * ) obtainedReal, 2, fftSize / 2 );
 	//NSLog(@"here %i", borked++);
 	
-	retVal = makeMagnitudes(obtainedReal, fftSize);
+	retVal = makeMagnitudes(obtainedReal, fftSize, [self frequencies], LOW_PASS_FILTER);
 	//NSLog(@"here %i", borked++);
 
 	[self scale:retVal];
@@ -155,12 +158,20 @@ float solveOneA(float);
 
 @end
 
-NSMutableArray* makeMagnitudes(float* result, int size) {
+NSMutableArray* makeMagnitudes(float* result, int size, NSArray* freqs, int lowPassFilter) {
 	NSMutableArray* retVal = [[[NSMutableArray alloc] init] autorelease];
 	int i;
 	
 	for(i = 0; i < size; i += 2) {
-		double oneResult = sqrt((result[i] * result[i]) + (result[i + 1] * result[i + 1]));
+		double oneResult;
+		int freq = [[freqs objectAtIndex:i] intValue];
+		
+		if (freq > lowPassFilter) {
+			break;
+		}
+		
+		
+		oneResult = sqrt((result[i] * result[i]) + (result[i + 1] * result[i + 1]));
 		
 		[retVal addObject:[NSNumber numberWithDouble:oneResult]];
 	}

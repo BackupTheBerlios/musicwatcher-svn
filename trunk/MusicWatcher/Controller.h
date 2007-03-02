@@ -8,7 +8,7 @@
 #import "BarGrapher.h"
 #import "FFTEngine.h"
 #import "FFT.h"
-#import "FFTW.h"
+//#import "FFTW.h"
 
 @interface Controller : NSObject
 {

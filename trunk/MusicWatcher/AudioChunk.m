@@ -52,4 +52,26 @@
 	return ourChannels;
 }
 
+//FIXME - should this use RMS instead of a mean?
+-(NSArray *)mix {
+	NSMutableArray* retVal = [[[NSMutableArray alloc] init] autorelease];
+	int count = [[ourSamples objectAtIndex:0] count];
+	int i, j;
+	
+	for(i = 0; i < count; i++) {
+		float mixed = 0;
+		
+		for(j = 0; j < ourChannels; j++) {
+			mixed += [[[ourSamples objectAtIndex:j] objectAtIndex:i] floatValue];
+		}
+		
+		mixed = mixed / ourChannels;
+				
+		[retVal addObject:[NSNumber numberWithFloat:mixed]];
+	}
+	
+	
+	return retVal;
+}
+
 @end
