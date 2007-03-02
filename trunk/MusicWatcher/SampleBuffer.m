@@ -94,7 +94,9 @@ NSArray* convertToChunks(AudioBuffer* samples[], int count) {
 		int size = byteSize / sizeof(float);
 		int j;
 		
+#ifdef __LITTLE_ENDIAN__
 		byte_reverse(tmp, byteSize);
+#endif
 		
 		for(j = 0; j < size; j++) {
 			[newSamples addObject:[NSNumber numberWithFloat:tmp[j]]];
