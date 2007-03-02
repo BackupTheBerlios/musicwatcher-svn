@@ -81,6 +81,12 @@ void zeroArray(NSMutableArray*, int);
 	}
 }
 
+-(void)reset {
+	[peakValues removeAllObjects];
+	
+	[super reset];
+}
+
 @end
 
 void zeroArray(NSMutableArray* theArray, int count) {

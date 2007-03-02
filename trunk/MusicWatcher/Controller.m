@@ -34,6 +34,8 @@ NSArray* mean(NSArray *);
 	[stopButton setEnabled:NO];
 	[pauseButton setEnabled:NO];
 	[playPosition setEnabled:NO];
+	
+	[self startInterfaceTimer];
 }
 
 //actions
@@ -70,6 +72,10 @@ NSArray* mean(NSArray *);
 	NSMutableArray* rightFftValues = [[[NSMutableArray alloc] init] autorelease];
 	int count = [chunks count];
 	int i;
+	
+	if (count == 0) {
+		return;
+	}
 	
 	for(i = 0; i < count; i++) {
 		NSArray* leftFftResult;
@@ -147,8 +153,6 @@ NSArray* mean(NSArray *);
 	
 	[ourPlayer setDelegate:self];
 	
-	interfaceUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:span target:self selector:@selector(updateUI:) userInfo:nil repeats:YES];
-	
 	[ourPlayer play];
 	
 	[playPosition setMaxValue:[ourPlayer duration]];
@@ -169,24 +173,32 @@ NSArray* mean(NSArray *);
 	
 	stopRequested = YES;
 	
+	if ([ourPlayer isPaused]) {
+		[self startInterfaceTimer];
+	}
+	
 	[ourPlayer stop];
 	
 	[ourPlayer autorelease];
 	
 	ourPlayer = nil;
 	
-	[interfaceUpdateTimer invalidate];
-	
-	interfaceUpdateTimer = nil;	
-	
 	stopRequested = NO;
 	
 	[playPosition setFloatValue:0];
+	
+	[pauseButton setTitle:@"Pause"];
 	
 	[playButton setEnabled:YES];
 	[stopButton setEnabled:NO];
 	[pauseButton setEnabled:NO];
 	[playPosition setEnabled:NO];
+	
+	[leftSpectrumGraph reset];
+	[rightSpectrumGraph reset];
+	[volumeGraph reset];
+	
+	[sampleBuffer reset];
 }
 
 - (void)pausePlaying {
@@ -197,9 +209,28 @@ NSArray* mean(NSArray *);
 	if ([ourPlayer isPaused]) {
 		[ourPlayer resume];
 		[pauseButton setTitle:@"Pause"];
+		[self startInterfaceTimer];
 	} else {
 		[ourPlayer pause];
 		[pauseButton setTitle:@"Resume"];
+		[self stopInterfaceTimer];
+	}
+}
+
+-(void)startInterfaceTimer {
+	float span = (float)1 / FRAMES_PER_SECOND;
+	
+	if (interfaceUpdateTimer == nil) {
+		interfaceUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:span target:self selector:@selector(updateUI:) userInfo:nil repeats:YES];
+	}
+}
+
+-(void)stopInterfaceTimer {
+	
+	if (interfaceUpdateTimer != nil) {
+		[interfaceUpdateTimer invalidate];
+		
+		interfaceUpdateTimer = nil;	
 	}
 }
 

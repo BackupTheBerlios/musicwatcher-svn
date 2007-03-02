@@ -41,6 +41,11 @@ void byte_reverse(float *, int);
 	[bufferLock unlock];
 }
 
+-(void)reset {
+	//getAudioChunks does a good job of resetting the buffer
+	[self getAudioChunks];
+}
+
 -(NSArray*)getAudioChunks {
 	AudioBuffer* tmpBuffer[NUM_BUFFERS];
 	NSArray* retVal;

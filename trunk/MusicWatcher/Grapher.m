@@ -46,16 +46,16 @@
 {
     [self discardCursorRects];
 	[self addTrackingRect:[self visibleRect] owner:self userData:nil assumeInside:NO];
-
-	NSLog(@"reset cursor points");
 }
 
 - (void)mouseEntered:(NSEvent *)theEvent {
 	showAdjuster = YES;
+	[self setNeedsDisplay:YES];
 }
 
 - (void)mouseExited:(NSEvent *)theEvent {
 	showAdjuster = NO;
+	[self setNeedsDisplay:YES];
 }
 
 -(void)mouseDown:(NSEvent *)event {
@@ -68,6 +68,7 @@
 		draggingSideDot = YES;
 	}
 
+	[self setNeedsDisplay:YES];
 }
 
 -(void)mouseDragged:(NSEvent *)event
@@ -91,11 +92,14 @@
 		[userInfo setObject:[NSNumber numberWithFloat:newScale] forKey:@"newValue"];
 		
 		[[NSNotificationCenter defaultCenter] postNotificationName:@"BarGrapherDidChangeYScale" object:self userInfo:userInfo];
+		
+		[self setNeedsDisplay:YES];
 	}
 }
 
 -(void)mouseUp:(NSEvent *)event {
 	draggingSideDot = NO;
+	[self setNeedsDisplay:YES];
 }
 
 - (void) drawRect:(NSRect)viewSize {
@@ -171,6 +175,13 @@
 	} else {
 		return 0;
 	}
+}
+
+-(void)reset {
+	[xData removeAllObjects];
+	[yData removeAllObjects];
+	
+	[self setNeedsDisplay:YES];
 }
 
 @end
