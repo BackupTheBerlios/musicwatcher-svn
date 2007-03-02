@@ -1,0 +1,9 @@
+--- Navigation tree
+- text: Home
+  uri: /
+- text: Download
+  uri: http://developer.berlios.de/project/showfiles.php?group_id=8145
+- text: Project Page
+  uri: http://developer.berlios.de/projects/musicwatcher
+- text: Mail List
+  uri: https://lists.berlios.de/mailman/listinfo/musicwatcher-dev

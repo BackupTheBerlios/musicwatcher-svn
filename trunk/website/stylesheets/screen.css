@@ -1,0 +1,40 @@
+#title.h2 {
+  margin: .25em;
+}
+
+img {
+  border-style: none;
+}
+
+#leftside {
+  border-style: solid;
+  border-width: 2px;
+  padding: 0;
+  width: auto;
+  height: auto;
+
+  float: left;
+}
+
+.leftbox {
+  border-style: solid;
+  border-width: 2px;
+  padding: .5em;
+  margin: 2px;
+
+  width: auto;
+  height: auto;
+}
+
+.attention {
+  font-size: 200%; 
+}
+
+.thumbnail {
+  margin: 1em;
+  float: left;
+
+  height: 300;
+  width: 300;
+}
+
