@@ -260,8 +260,8 @@
 	2F4AC7730B94EB1E00C552AD /* SampleBuffer.m */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1057, 2198}}";
-			sepNavSelRange = "{1540, 0}";
-			sepNavVisRect = "{{0, 598}, {1057, 749}}";
+			sepNavSelRange = "{3077, 0}";
+			sepNavVisRect = "{{0, 1449}, {1057, 749}}";
 			sepNavWindowFrame = "{{191, 0}, {1102, 878}}";
 		};
 	};
