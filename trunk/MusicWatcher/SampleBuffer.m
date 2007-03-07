@@ -7,6 +7,7 @@
 //
 
 #import <string.h>
+#import <unistd.h>
 
 #import "SampleBuffer.h"
 #import "AudioChunk.h"
@@ -67,6 +68,14 @@ void byte_reverse(float *, int);
 	
 	[bufferLock unlock];
 		
+	//int r;
+	//for(r = 0; r < 512; r++) {
+	//	AudioBuffer* foo = tmpBuffer[0];
+	//	float* foobar = (float *)foo->mData;
+	//	NSLog(@"foobar: %f", foobar[r]);
+	//}
+	
+		
 	retVal = convertToChunks(tmpBuffer, bufSize);
 	
 	for(i = 0; i < bufSize; i++) {
@@ -86,23 +95,22 @@ NSArray* convertToChunks(AudioBuffer* samples[], int count) {
 	
 	//iterate over each buffer
 	for(i = 0; i < count; i++) {
-		NSMutableArray* newSamples = [[[NSMutableArray alloc] init] autorelease];
 		AudioBuffer* buf = samples[i];
 		AudioChunk* newChunk;
-		float* tmp = buf->mData;
-		int byteSize = buf->mDataByteSize;
-		int size = byteSize / sizeof(float);
-		int j;
+		
+		//for(r = 0; r < buf->mDataByteSize; r++) {
+		//	float* foobar = (float *)buf->mData;
+		//	NSLog(@"foobar: %f", foobar[r]);
+		//}
+
 		
 #ifdef __LITTLE_ENDIAN__
-		byte_reverse(tmp, byteSize);
+		byte_reverse(buf->mData, buf->mDataByteSize);
 #endif
+	
 		
-		for(j = 0; j < size; j++) {
-			[newSamples addObject:[NSNumber numberWithFloat:tmp[j]]];
-		}
-				
-		newChunk = [[[AudioChunk alloc] initWithSamples:newSamples channels:buf->mNumberChannels] autorelease];
+		newChunk = [[[AudioChunk alloc] initWithPCM:buf->mData size:buf->mDataByteSize channels:buf->mNumberChannels] autorelease];
+		
 				
 		[retVal addObject:newChunk];
 	}

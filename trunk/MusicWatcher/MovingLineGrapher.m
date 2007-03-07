@@ -8,68 +8,55 @@
 
 #import "MovingLineGrapher.h"
 
+#import <string.h>
+
 #define GRAPH_WIDTH 4096
 
 @implementation MovingLineGrapher
 
 - (void)awakeFromNib {
-	int i;
-	
-	if (xData == nil) {
-		xData = [[NSMutableArray alloc] init];
-	}
-	
-	for(i = 0; i < GRAPH_WIDTH; i++) {
-		[xData addObject:[NSNumber numberWithInt:0]];
-	}
 }
 
-- (void)dealloc {
-	if (xData != nil) {
-		[xData release];
-	}
-	
+-(void)dealloc {	
 	[super dealloc];
 }
 
-- (void)addXData:(NSArray*)newData {
-	int size;
+- (void)addXData:(float*)newData size:(int)size {
+	float* p; 
 	
-	[xData addObjectsFromArray:newData];
-	
-	size = [xData count];
-	
-	if (size >= GRAPH_WIDTH) {
-		int trim = size - GRAPH_WIDTH;
-		
-		[xData removeObjectsInRange:NSMakeRange(0, trim)];
+	if (size > GRAPH_WIDTH) {
+		size = GRAPH_WIDTH;
 	}
 	
-	[self setNeedsDisplay:YES];
+	p = &xData[size - 1];
+		
+	//memcpy(tmpAudioData, p, GRAPH_WIDTH - size);
+	
+	p = &tmpAudioData[GRAPH_WIDTH - size];
+	
+	//memcpy(p, newData, size);
+		
+	[self setXData:tmpAudioData size:GRAPH_WIDTH];
 }
 
 - (void)drawRect:(NSRect)viewArea {
-	int dataSize = [xData count];
-	float pointDistance = viewArea.size.width / dataSize;
+	float pointDistance = viewArea.size.width / xDataSize;
 	float viewHeight = viewArea.size.height;
-	int i = 0;
 	NSBezierPath* brush = [NSBezierPath bezierPath];
+	int i;
 	
 	[super drawRect:viewArea];
 	
 	[[NSColor whiteColor] set];
 	
 	[brush moveToPoint:NSMakePoint(0, 0)];
-		
-	for(; i < dataSize; i++) {
-		NSNumber* num = [xData objectAtIndex:i]; 
-		float height = viewHeight * [num floatValue] / 2 + viewHeight / 2;
+			
+	for(i = 0; i < xDataSize; i++) {
+		float height = viewHeight * xData[i] / 2 + viewHeight / 2;
 		float x1 = pointDistance * i;
 		float y1 = height;
 		NSPoint curPoint = NSMakePoint(x1, y1);
-		
-		//NSLog(@"new point: %f %f", x1, y1);
-		
+						
 		[brush lineToPoint:curPoint];
 	}
 	

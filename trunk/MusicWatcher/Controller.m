@@ -55,7 +55,7 @@ NSArray* mean(NSArray *);
 }
 
 -(IBAction)playPosition:(id)sender {
-	NSLog(@"requested seek to %f", [sender floatValue]);
+	//NSLog(@"requested seek to %f", [sender floatValue]);
 	[ourPlayer setPlaybackPosition:[sender floatValue]];
 }
 
@@ -68,8 +68,6 @@ NSArray* mean(NSArray *);
 //timers
 - (void)updateUI:(NSTimer *)theTimer {	
 	NSArray* chunks = [sampleBuffer getAudioChunks];
-	NSMutableArray* leftFftValues = [[[NSMutableArray alloc] init] autorelease];
-	NSMutableArray* rightFftValues = [[[NSMutableArray alloc] init] autorelease];
 	int count = [chunks count];
 	int i;
 	
@@ -78,20 +76,18 @@ NSArray* mean(NSArray *);
 	}
 	
 	for(i = 0; i < count; i++) {
-		NSArray* leftFftResult;
-		NSArray* rightFftResult;
+		AudioChunk* chunk = [chunks objectAtIndex:i];
+		[volumeGraph setXData:[chunk channel:0] size:[chunk size]];
 		
-		[volumeGraph addXData:[[chunks objectAtIndex:i] mix]];
+		//leftFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:0]];
+		//rightFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:1]];
 		
-		leftFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:0]];
-		rightFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:1]];
-		
-		[leftFftValues addObject:leftFftResult];
-		[rightFftValues addObject:rightFftResult];
+		//[leftFftValues addObject:leftFftResult];
+		//[rightFftValues addObject:rightFftResult];
 	}
 	
-	[leftSpectrumGraph setXData:mean(leftFftValues)];
-	[rightSpectrumGraph setXData:mean(rightFftValues)];
+	//[leftSpectrumGraph setXData:mean(leftFftValues)];
+	//[rightSpectrumGraph setXData:mean(rightFftValues)];
 	
 	[playPosition setFloatValue:[ourPlayer playbackPosition]];
 }
@@ -196,7 +192,7 @@ NSArray* mean(NSArray *);
 	
 	[leftSpectrumGraph reset];
 	[rightSpectrumGraph reset];
-	[volumeGraph reset];
+	//[volumeGraph reset];
 	
 	[sampleBuffer reset];
 }

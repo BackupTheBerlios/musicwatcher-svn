@@ -8,44 +8,47 @@
 
 #import "AudioChunk.h"
 
+float ** splitPCM(float*, int, int);
 
 @implementation AudioChunk
 
--(id)initWithSamples:(NSArray *)samples channels:(int)channels {
+-(id)initWithPCM:(float *)pcm size:(int)size channels:(int)channels {
 	self = [self init];
-	int count = [samples count];
-	int sampleNum = 0;
-	int i;
 	
+	audioDataSize = size;
+	audioData = splitPCM(pcm, size, channels);
 	ourChannels = channels;
-	ourSamples = [[NSMutableArray alloc] init];
 	
-	for(i = 0; i < ourChannels; i++) {
-		[ourSamples addObject:[[[NSMutableArray alloc] init] autorelease]];
-	}
-	
-	//split apart the samples into their channels
-	for(i = 0; i < count; i++) {
-		int arrayNum = sampleNum % channels;
-		
-		[[ourSamples objectAtIndex:arrayNum] addObject:[samples objectAtIndex:i]];
-				
-		sampleNum++;
-	}
+	mixedAudioData = malloc(sizeof(float) * size / channels);
 	
 	return self;
 }
 
 -(void) dealloc {
-	if (ourSamples != nil) {
-		[ourSamples release];
+	if (audioData != nil) {
+		int i;
+		
+		for(i = 0; i < ourChannels; i++) {
+			free(audioData[i]);
+		}
+		
+		free(audioData);
 	}
-
+	
+	if (mixedAudioData != nil) {
+		free(mixedAudioData);
+	}
+	
 	[super dealloc];
 }
 
--(NSArray*)channel:(int)chanNum {
-	return [ourSamples objectAtIndex:chanNum];
+//this returns the size of each channel or the channels mixed together
+-(int)size {
+	return audioDataSize / ourChannels;
+}
+
+-(float *)channel:(int)chanNum {
+	return audioData[chanNum];
 }
 
 -(int)numChannels {
@@ -53,25 +56,48 @@
 }
 
 //FIXME - should this use RMS instead of a mean?
--(NSArray *)mix {
-	NSMutableArray* retVal = [[[NSMutableArray alloc] init] autorelease];
-	int count = [[ourSamples objectAtIndex:0] count];
+-(float *)mix {
+	int count = [self size];
 	int i, j;
 	
 	for(i = 0; i < count; i++) {
 		float mixed = 0;
 		
 		for(j = 0; j < ourChannels; j++) {
-			mixed += [[[ourSamples objectAtIndex:j] objectAtIndex:i] floatValue];
+			mixed += audioData[j][i];
 		}
 		
 		mixed = mixed / ourChannels;
 				
-		[retVal addObject:[NSNumber numberWithFloat:mixed]];
+		mixedAudioData[i] = mixed;
 	}
 	
 	
-	return retVal;
+	return mixedAudioData;
 }
 
 @end
+
+float ** splitPCM(float* audio, int size, int channels) {
+	float** retVal = malloc(sizeof(float *) * channels);
+	int i;
+	int offset = 0;
+	
+	for(i = 0; i < channels; i++) {
+		retVal[i] = malloc(size / channels);
+	}
+	
+	for(i = 0; i < size; i++) {
+		int channel = i % channels;
+				
+		retVal[channel][offset] = audio[i];
+		
+		if (channel == channels) {
+			offset++;
+		}
+	
+		//NSLog(@"stuffed %f", audio[i]);
+	}
+	
+	return retVal;
+}

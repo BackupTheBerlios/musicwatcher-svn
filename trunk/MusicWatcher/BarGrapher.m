@@ -16,6 +16,8 @@ void zeroArray(NSMutableArray*, int);
 
 @implementation BarGrapher
 
+#if 0
+
 -(void) awakeFromNib {
 	peakValues = [[NSMutableArray alloc] init];
 	yMax = 1.0;
@@ -88,6 +90,8 @@ void zeroArray(NSMutableArray*, int);
 }
 
 @end
+
+#endif
 
 void zeroArray(NSMutableArray* theArray, int count) {
 	int toAdd = count - [theArray count];

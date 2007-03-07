@@ -10,17 +10,15 @@
 
 
 @interface Grapher : NSView {
-	NSMutableArray*	xData; 
+	float*	xData; 
+	int xDataSize;
 	NSMutableArray*	yData; 
 	BOOL showAdjuster;
 	float yMax;
-	BOOL draggingSideDot;
 }
 
-- (NSRect) sideDotRect;
 - (void) setYData:(NSMutableArray *)data;
-- (void) setXData:(NSMutableArray *)data;
+- (void) setXData:(float *)data size:(int)size;
 -(void)setYMax:(float)newMax;
--(float)leftDrawingOffset;
 
 @end

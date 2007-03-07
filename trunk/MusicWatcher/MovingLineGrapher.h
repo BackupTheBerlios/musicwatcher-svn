@@ -11,6 +11,7 @@
 #import "Grapher.h"
 
 @interface MovingLineGrapher : Grapher {
+	float* tmpAudioData;
 }
 
 @end

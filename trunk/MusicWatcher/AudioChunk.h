@@ -10,11 +10,15 @@
 
 
 @interface AudioChunk : NSObject {
-	NSMutableArray* ourSamples;
 	int ourChannels;
+	float** audioData;
+	float* mixedAudioData;
+	int audioDataSize;
 }
 
--(NSArray*)channel:(int)chanNum;
+-(id)initWithPCM:(float *)pcm size:(int)size channels:(int)channels;
+-(float *)channel:(int)chanNum;
+-(float *)mix;
 -(int)numChannels;
 
 @end
