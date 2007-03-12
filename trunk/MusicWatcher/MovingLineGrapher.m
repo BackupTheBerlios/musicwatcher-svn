@@ -15,27 +15,36 @@
 @implementation MovingLineGrapher
 
 - (void)awakeFromNib {
+	tmpAudioData = malloc(sizeof(float) * GRAPH_WIDTH);
 }
 
 -(void)dealloc {	
+	if (tmpAudioData != nil) {
+		free(tmpAudioData);
+	}
+	
 	[super dealloc];
 }
 
 - (void)addXData:(float*)newData size:(int)size {
-	float* p; 
+	int i;
+	
+	if (size == 0) {
+		return;
+	}
 	
 	if (size > GRAPH_WIDTH) {
 		size = GRAPH_WIDTH;
 	}
 	
-	p = &xData[size - 1];
-		
-	//memcpy(tmpAudioData, p, GRAPH_WIDTH - size);
+	for(i = 0; i < GRAPH_WIDTH - size; i++) {
+		tmpAudioData[i] = tmpAudioData[i + size];
+	}
 	
-	p = &tmpAudioData[GRAPH_WIDTH - size];
+	for(i = 0; i < size; i++) {
+		tmpAudioData[i + GRAPH_WIDTH - size] = newData[i];
+	}
 	
-	//memcpy(p, newData, size);
-		
 	[self setXData:tmpAudioData size:GRAPH_WIDTH];
 }
 

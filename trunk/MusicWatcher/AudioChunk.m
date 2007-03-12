@@ -48,6 +48,14 @@ float ** splitPCM(float*, int, int);
 }
 
 -(float *)channel:(int)chanNum {
+	int i = 0;
+	
+	//NSLog(@"pointer is now %p", audioData);
+	
+	for(; i < audioDataSize / ourChannels; i++) {
+		//NSLog(@"blah: %f", audioData[chanNum][i]);
+	}
+	
 	return audioData[chanNum];
 }
 
@@ -83,20 +91,22 @@ float ** splitPCM(float* audio, int size, int channels) {
 	int i;
 	int offset = 0;
 	
+	//NSLog(@"size is %i", size);
+	
 	for(i = 0; i < channels; i++) {
-		retVal[i] = malloc(size / channels);
+		retVal[i] = malloc(sizeof(float) * size / channels);
+		//NSLog(@"malloc: %i i: %i", size / channels, i);
 	}
 	
 	for(i = 0; i < size; i++) {
 		int channel = i % channels;
-				
+						
 		retVal[channel][offset] = audio[i];
+		//NSLog(@"channel: %i offset: %i value: %f", channel, offset, audio[i]);
 		
-		if (channel == channels) {
+		if (channel == channels - 1) {
 			offset++;
 		}
-	
-		//NSLog(@"stuffed %f", audio[i]);
 	}
 	
 	return retVal;

@@ -77,7 +77,7 @@ NSArray* mean(NSArray *);
 	
 	for(i = 0; i < count; i++) {
 		AudioChunk* chunk = [chunks objectAtIndex:i];
-		[volumeGraph setXData:[chunk channel:0] size:[chunk size]];
+		[volumeGraph addXData:[chunk mix] size:[chunk size]];
 		
 		//leftFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:0]];
 		//rightFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:1]];

@@ -107,11 +107,9 @@ NSArray* convertToChunks(AudioBuffer* samples[], int count) {
 #ifdef __LITTLE_ENDIAN__
 		byte_reverse(buf->mData, buf->mDataByteSize);
 #endif
-	
 		
-		newChunk = [[[AudioChunk alloc] initWithPCM:buf->mData size:buf->mDataByteSize channels:buf->mNumberChannels] autorelease];
-		
-				
+		newChunk = [[[AudioChunk alloc] initWithPCM:buf->mData size:buf->mDataByteSize / sizeof(float) channels:buf->mNumberChannels] autorelease];
+						
 		[retVal addObject:newChunk];
 	}
 	
