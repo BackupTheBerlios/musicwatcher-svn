@@ -10,12 +10,13 @@
 
 #import <math.h>
 
+#import "FFTEngine.h"
 #import "FFT.h"
 
 //even the low pass filter isn't working right! this is really filtering at 10k
 #define LOW_PASS_FILTER 20000
 
-NSMutableArray* makeMagnitudes(float*, int, NSArray*, int);
+void makeMagnitudes(float*, float*, int, float*, int);
 float solveOneA(float);
 
 @implementation FFT
@@ -40,7 +41,12 @@ float solveOneA(float);
 	
 	fftSetup = vDSP_create_fftsetup ( fftSizeDamnApple, FFT_RADIX2);
 	
+	//generate the freq list
+	[self frequencies];
+	
 	[self makeScaleValues];
+	
+	FFTAnswer = malloc(sizeof(float) * freqSize);
 	
 	return self;
 }
@@ -51,39 +57,52 @@ float solveOneA(float);
 	free ( originalReal );
 	free ( A.realp );
 	free ( A.imagp );
+	free (FFTAnswer);
+	free (freqAnswer);
+	free (scaleValues);
 	
 	[super dealloc];
 }
 
 -(NSArray*) frequencies {
-	NSMutableArray* freqs = [[[NSMutableArray alloc] init] autorelease];
 	int i;
+
+	freqSize = fftSize / 2 + 1;
 	
-	for(i = 0; i < fftSize / 2 + 1; i++) {
-		int oneValue = (float)i / fftSize * sampleRate;
-		[freqs addObject:[NSNumber numberWithInt:oneValue]];
+	if (freqAnswer != nil) {
+		return freqAnswer;
 	}
 	
-	return freqs;
+	freqAnswer = malloc(sizeof(float) * freqSize);
+	
+	for(i = 0; i < freqSize; i++) {
+		float oneValue = (float)i / fftSize * sampleRate;
+		freqAnswer[i] = oneValue;
+	}
+	
+	return freqAnswer;
 }
 
--(NSArray*)doEasyFFT:(NSArray *)samples {
-	NSMutableArray *retVal;
+-(int) freqSize {
+	return freqSize;
+}
+
+-(float *)doEasyFFT:(float [])PCM size:(int)size {
 	//why doesn't the apple suplied example work?
 	//float scale = (float)1.0/(2*fftSize);
 	float scale = (float)1.0/(4*fftSizeDamnApple);
 	int i;
-	int borked = 0;
 	
-	if ([samples count] != fftSize) {
-		NSLog(@"FFTW: sample count of %i was not %i", [samples count], fftSize);
+	if (size != fftSize) {
+		NSLog(@"FFTW: sample count of %i was not %i", size, fftSize);
 		return nil;
 	}
 
 	//NSLog(@"here %i", borked++);
 	
+	//FIXME - this might be the problem, should we really increment by 2?
 	for(i = 0; i < fftSize; i += 2) {
-		originalReal[i] = [[samples objectAtIndex:i] floatValue];
+		originalReal[i] = PCM[i];
 	}
 	
 	//NSLog(@"here %i", borked++);
@@ -106,43 +125,39 @@ float solveOneA(float);
 	vDSP_ztoc ( &A, 1, ( COMPLEX * ) obtainedReal, 2, fftSize / 2 );
 	//NSLog(@"here %i", borked++);
 	
-	retVal = makeMagnitudes(obtainedReal, fftSize, [self frequencies], LOW_PASS_FILTER);
+	makeMagnitudes(FFTAnswer, obtainedReal, fftSize, [self frequencies], LOW_PASS_FILTER);
 	//NSLog(@"here %i", borked++);
 
-	[self scale:retVal];
+	[self scale];
 
-	return retVal;
+	return FFTAnswer;
 }	
 
 -(void) makeScaleValues {
-	NSArray* freqs = [self frequencies];
-	int count = [freqs count];
 	int i;
 	
-	scaleValues = [[NSMutableArray alloc] init];
-	
-	for(i = 0; i < count; i++) {
-		float freq = [[freqs objectAtIndex:i] floatValue];
+	scaleValues = malloc(sizeof(float) * freqSize);
+		
+	for(i = 0; i < freqSize; i++) {
+		float freq = freqAnswer[i];
 		float correction = solveOneA(freq);
 		
 		//NSLog(@"correction is: %f freq is %f", correction, freq);
 		
 		if (freq < 10000) {
-			[scaleValues addObject:[NSNumber numberWithFloat:correction]];
+			scaleValues[i] = correction;
 		} else {
-			[scaleValues addObject:[NSNumber numberWithFloat:1.0]];
+			scaleValues[i] = 1.0;
 		}
-		
 	}
 }
 
--(void) scale:(NSMutableArray*)data {
-	int count = [data count];
+-(void) scale {
 	int i;
 	
-	for(i = 0; i < count; i++) {
-		float correction = [[scaleValues objectAtIndex:i] floatValue];
-		float oneValue = [[data objectAtIndex:i] floatValue];
+	for(i = 0; i < freqSize; i++) {
+		float correction = scaleValues[i];
+		float oneValue = FFTAnswer[i];
 		float newValue;
 		
 		newValue = oneValue * correction;
@@ -150,21 +165,21 @@ float solveOneA(float);
 		//NSLog(@"one: %f new: %f correction: %f", oneValue, newValue, correction);
 		
 		//NSLog(@"one value: %f new value: %f max reading: %f", oneValue, newValue, (float)maxReading);
-		
-		[data replaceObjectAtIndex:i withObject:[NSNumber numberWithFloat:newValue]];
+
+		FFTAnswer[i] = newValue;
 	}
 }
 
 
 @end
 
-NSMutableArray* makeMagnitudes(float* result, int size, NSArray* freqs, int lowPassFilter) {
-	NSMutableArray* retVal = [[[NSMutableArray alloc] init] autorelease];
+void makeMagnitudes(float* answer, float* result, int size, float* freqs, int lowPassFilter) {
 	int i;
 	
+	//FIXME - again, should we really increment by 2?
 	for(i = 0; i < size; i += 2) {
 		double oneResult;
-		int freq = [[freqs objectAtIndex:i] intValue];
+		float freq = freqs[i];
 		
 		if (freq > lowPassFilter) {
 			break;
@@ -173,12 +188,11 @@ NSMutableArray* makeMagnitudes(float* result, int size, NSArray* freqs, int lowP
 		
 		oneResult = sqrt((result[i] * result[i]) + (result[i + 1] * result[i + 1]));
 		
-		[retVal addObject:[NSNumber numberWithDouble:oneResult]];
+		answer[i] = oneResult;
 	}
-	
-	return retVal;
 }
 
+//solve the A curve for a single frequency
 float solveOneA(float freq) {
 	float term1 = (freq * freq) + (20.6 * 20.6);
 	float term2 = (freq * freq) + + (12200.0 * 12200.0);

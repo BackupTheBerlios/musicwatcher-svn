@@ -1,3 +1,5 @@
+#import <string.h>
+
 #import "Controller.h"
 
 #define FRAMES_PER_SECOND 30
@@ -7,7 +9,7 @@
 //for FFTW
 //#define FFT_SIZE 512
 
-NSArray* mean(NSArray *);
+float* mean(float **, int, int);
 
 @implementation Controller
 
@@ -69,27 +71,52 @@ NSArray* mean(NSArray *);
 - (void)updateUI:(NSTimer *)theTimer {	
 	NSArray* chunks = [sampleBuffer getAudioChunks];
 	int count = [chunks count];
+	int size;
 	int i;
+	float*** FFTResults;
 	
 	if (count == 0) {
 		return;
 	}
 	
-	for(i = 0; i < count; i++) {
-		AudioChunk* chunk = [chunks objectAtIndex:i];
-		[volumeGraph addXData:[chunk mix] size:[chunk size]];
+	size = [ourFFT freqSize];
+	
+	FFTResults = malloc(sizeof(float **) * 2);
+	
+	for(i = 0; i < 2; i++) {
+		int j;
+		FFTResults[i] = malloc(sizeof(float *) * count);
 		
-		//leftFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:0]];
-		//rightFftResult = [ourFFT doEasyFFT:[[chunks objectAtIndex:i] channel:1]];
-		
-		//[leftFftValues addObject:leftFftResult];
-		//[rightFftValues addObject:rightFftResult];
+		for(j = 0; j < count; j++) {
+			FFTResults[i][j] = malloc(sizeof(float) * size);
+		}
 	}
 	
-	//[leftSpectrumGraph setXData:mean(leftFftValues)];
-	//[rightSpectrumGraph setXData:mean(rightFftValues)];
+	for(i = 0; i < count; i++) {
+		AudioChunk* chunk = [chunks objectAtIndex:i];
+				
+		[volumeGraph addXData:[chunk mix] size:[chunk size]];
+		
+		memcpy(FFTResults[0][i], [ourFFT doEasyFFT:[chunk channel:0] size:[chunk size]], sizeof(float) * size);
+		memcpy(FFTResults[1][i], [ourFFT doEasyFFT:[chunk channel:1] size:[chunk size]], sizeof(float) * size);
+	}
+	
+	[leftSpectrumGraph setXData:mean(FFTResults[0], count, size) size:size];
+	[rightSpectrumGraph setXData:mean(FFTResults[1], count, size) size:size];
 	
 	[playPosition setFloatValue:[ourPlayer playbackPosition]];
+	
+	for(i = 0; i < 2; i++) {
+		int j;
+		
+		for(j = 0; j < count; j++) {
+			free(FFTResults[i][j]);
+		}
+		
+		free(FFTResults[i]);
+	}
+	
+	free(FFTResults);
 }
 
 //delegation
@@ -190,8 +217,8 @@ NSArray* mean(NSArray *);
 	[pauseButton setEnabled:NO];
 	[playPosition setEnabled:NO];
 	
-	[leftSpectrumGraph reset];
-	[rightSpectrumGraph reset];
+	//[leftSpectrumGraph reset];
+	//[rightSpectrumGraph reset];
 	//[volumeGraph reset];
 	
 	[sampleBuffer reset];
@@ -232,23 +259,19 @@ NSArray* mean(NSArray *);
 
 @end
 
-NSArray* mean(NSArray *arrays) {
-	NSMutableArray* retVal = [[[NSMutableArray alloc] init] autorelease];
-	int count = [[arrays objectAtIndex:0] count];
-	int numArrays = [arrays count];
+float* mean(float **data, int count, int size) {
 	int i, j;
 	
-	for(i = 0; i < count; i++) {
+	for(i = 0; i < size; i++) {
 		float sum = 0;
 		
-		for(j = 0; j < numArrays; j++) {
-			sum += [[[arrays objectAtIndex:j] objectAtIndex:i] floatValue];
+		for(j = 0; j < count; j++) {
+			sum += data[j][i];
 		}
+				
+		data[0][i] = sum / count;
 		
-		sum = sum / numArrays;
-		
-		[retVal addObject:[NSNumber numberWithFloat:sum]];
 	}
 	
-	return retVal;
+	return data[0];
 }

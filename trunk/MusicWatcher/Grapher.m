@@ -55,20 +55,15 @@
 		if (xData != nil) {
 			free(xData);
 		}
-		
+				
 		xData = malloc(sizeof(float) * size);
+		xDataSize = size;
 	}
 	
 	for(i = 0; i < size; i++) {
 		xData[i] = data[i];
-		
-		//NSLog(@"float: %f", data[i]);
 	}
-	
-	//memcpy(xData, data, size);
-	
-	xDataSize = size;
-			
+		
 	[self setNeedsDisplay:YES];
 }
 

@@ -16,8 +16,6 @@ void zeroArray(NSMutableArray*, int);
 
 @implementation BarGrapher
 
-#if 0
-
 -(void) awakeFromNib {
 	peakValues = [[NSMutableArray alloc] init];
 	yMax = 1.0;
@@ -33,9 +31,8 @@ void zeroArray(NSMutableArray*, int);
 
 
 - (void)drawRect:(NSRect)viewArea {
-	float leftOffset = [self leftDrawingOffset];
-	int dataSize = [xData count];
-	float fullWidth = (viewArea.size.width - leftOffset) / dataSize;
+	float leftOffset = 0; //[self leftDrawingOffset];
+	float fullWidth = (viewArea.size.width - leftOffset) / xDataSize;
 	float barWidth = fullWidth - (fullWidth * BAR_SPACING * 2);
 	int i = 0;
 			
@@ -43,12 +40,12 @@ void zeroArray(NSMutableArray*, int);
 		
 	[[NSColor whiteColor] set];
 	
-	if ([peakValues count] < dataSize) {
-		zeroArray(peakValues, dataSize);
+	if ([peakValues count] < xDataSize) {
+		zeroArray(peakValues, xDataSize);
 	}
 	
-	for(; i < dataSize; i++) {
-		float dataPoint = [[xData objectAtIndex:i] floatValue] / yMax;
+	for(; i < xDataSize; i++) {
+		float dataPoint = xData[i] / yMax;
 		NSNumber* peakValue = [peakValues objectAtIndex:i];
 		float x0 = (i * fullWidth) + barWidth / 8 + leftOffset;
 		float height = dataPoint * viewArea.size.height;
@@ -78,9 +75,9 @@ void zeroArray(NSMutableArray*, int);
 		[peakValues replaceObjectAtIndex:i withObject:[NSNumber numberWithFloat:newPeak]];
 	}
 	
-	if (showAdjuster){
-		[self drawAdjuster];
-	}
+	//if (showAdjuster){
+	//	[self drawAdjuster];
+	//}
 }
 
 -(void)reset {
@@ -90,8 +87,6 @@ void zeroArray(NSMutableArray*, int);
 }
 
 @end
-
-#endif
 
 void zeroArray(NSMutableArray* theArray, int count) {
 	int toAdd = count - [theArray count];
