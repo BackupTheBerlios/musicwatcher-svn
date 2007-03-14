@@ -16,8 +16,6 @@ float* mean(float **, int, int);
 - (void)awakeFromNib {
 	
 	sampleBuffer = [[SampleBuffer alloc] init];
-
-	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(fileDropped:) name:@"FileDrop" object:nil];
 	
 	//FIME - this won't always be 44100
 	ourFFT = [[FFT alloc] initWithFFTSize:FFT_SIZE sampleRate:44100];
@@ -31,11 +29,20 @@ float* mean(float **, int, int);
 	[mainWindow registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
 	[mainWindow setAcceptsMouseMovedEvents:YES];
 	
+	[NSApp setDelegate:self];
+	
 	[fileDisplay setStringValue:@""];
 	
+	[fileMenu setAutoenablesItems:NO];
+	
+	[playButton setEnabled:NO];
 	[stopButton setEnabled:NO];
 	[pauseButton setEnabled:NO];
 	[playPosition setEnabled:NO];
+	
+	[fileStop setEnabled:NO];
+	[filePlay setEnabled:NO];
+	[filePause setEnabled:NO];
 	
 	[self startInterfaceTimer];
 }
@@ -56,16 +63,22 @@ float* mean(float **, int, int);
 	[self stopPlaying];
 }
 
+- (IBAction)fileOpen:(id)sender {
+	NSOpenPanel * panel = [NSOpenPanel openPanel];
+	[panel beginSheetForDirectory:nil
+							 file:nil
+							types:nil
+				   modalForWindow:[NSApp mainWindow]
+					modalDelegate:self
+				   didEndSelector:@selector(openPanelDidEnd:returnCode:contextInfo:)
+					  contextInfo:nil];
+}
+
 -(IBAction)playPosition:(id)sender {
 	//NSLog(@"requested seek to %f", [sender floatValue]);
 	[ourPlayer setPlaybackPosition:[sender floatValue]];
 }
 
-//notifications
-- (void)fileDropped:(id)notification {
-	NSString* file = [notification userInfo];
-	[fileDisplay setStringValue:file];
-}
 
 //timers
 - (void)updateUI:(NSTimer *)theTimer {	
@@ -121,6 +134,13 @@ float* mean(float **, int, int);
 
 //delegation
 
+//NSApplication delegation
+- (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename {
+	[self openFile:filename];
+	
+	return YES;
+}
+
 //QTSoundFilePlayer delegation
 - (void)qtSoundFilePlayer:(QTSoundFilePlayer *)player didFinishPlaying:(BOOL)aBool {
 	if (! stopRequested) {
@@ -129,6 +149,8 @@ float* mean(float **, int, int);
 }
 
 - (void)qtSoundFilePlayer:(QTSoundFilePlayer *)Player didPlayAudioBuffer:(AudioBuffer *)buffer {
+	//even though we have been warned, throughly, about locking a lock in this thread, we do it anyway in the sample buffer - doesn't seem to cause
+	//any problems as long as we keep the latency down 
 	[sampleBuffer addAudioBuffer:buffer];
 }
 
@@ -147,7 +169,7 @@ float* mean(float **, int, int);
 	
     if ( [[pboard types] containsObject:NSFilenamesPboardType] ) {
         NSArray *files = [pboard propertyListForType:NSFilenamesPboardType];
-		[[NSNotificationCenter defaultCenter] postNotificationName:@"FileDrop" object:self userInfo:[files objectAtIndex:0]];
+		[self openFile:[files objectAtIndex:0]];
 	}
 	
     return YES;
@@ -186,6 +208,10 @@ float* mean(float **, int, int);
 	[stopButton setEnabled:YES];
 	[pauseButton setEnabled:YES];
 	[playPosition setEnabled:YES];
+	
+	[filePlay setEnabled:NO];
+	[fileStop setEnabled:YES];
+	[filePause setEnabled:YES];
 
 }
 
@@ -211,12 +237,17 @@ float* mean(float **, int, int);
 	[playPosition setFloatValue:0];
 	
 	[pauseButton setTitle:@"Pause"];
-	
 	[playButton setEnabled:YES];
 	[stopButton setEnabled:NO];
 	[pauseButton setEnabled:NO];
-	[playPosition setEnabled:NO];
+
+	[filePause setTitle:@"Pause"];
+	[filePlay setEnabled:YES];
+	[fileStop setEnabled:NO];
+	[filePause setEnabled:NO];
 	
+	[playPosition setEnabled:NO];
+		
 	//[leftSpectrumGraph reset];
 	//[rightSpectrumGraph reset];
 	//[volumeGraph reset];
@@ -231,12 +262,18 @@ float* mean(float **, int, int);
 	
 	if ([ourPlayer isPaused]) {
 		[ourPlayer resume];
-		[pauseButton setTitle:@"Pause"];
+
 		[self startInterfaceTimer];
+
+		[pauseButton setTitle:@"Pause"];
+		[filePause setTitle:@"Pause"];
 	} else {
 		[ourPlayer pause];
-		[pauseButton setTitle:@"Resume"];
+	
 		[self stopInterfaceTimer];
+
+		[pauseButton setTitle:@"Resume"];
+		[filePause setTitle:@"Resume"];
 	}
 }
 
@@ -257,8 +294,32 @@ float* mean(float **, int, int);
 	}
 }
 
+- (void)openFile:(NSString*)file {
+	[fileDisplay setStringValue:file];
+	NSURL* fileURL = [NSURL fileURLWithPath:file];
+	
+	[playButton setEnabled:YES];
+	[filePlay setEnabled:YES];
+	
+	[[NSDocumentController sharedDocumentController] noteNewRecentDocumentURL:fileURL];
+	
+	if ([ourPlayer isPlaying]) {
+		[self stopPlaying];
+	}
+	
+	[self startPlaying];
+}
+
+- (void) openPanelDidEnd:(NSOpenPanel*)panel returnCode:(int)rc contextInfo:(void *) ctx
+{
+	if (rc == NSOKButton) {
+		[self openFile:[panel filename]];
+	}
+}
+
 @end
 
+//get the mean of the arrays and store the result in the 0th element of the array; returns data[0] for convenience
 float* mean(float **data, int count, int size) {
 	int i, j;
 	

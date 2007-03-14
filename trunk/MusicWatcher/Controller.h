@@ -22,6 +22,10 @@
 	IBOutlet NSButton* playButton;
 	IBOutlet NSButton* stopButton;
 	IBOutlet NSSlider* playPosition;
+	IBOutlet NSMenu* fileMenu;
+	IBOutlet NSMenuItem* filePlay;
+	IBOutlet NSMenuItem* fileStop;
+	IBOutlet NSMenuItem* filePause;
 	
 	QTSoundFilePlayer* ourPlayer;
 	SampleBuffer* sampleBuffer;
@@ -35,4 +39,5 @@
 - (IBAction)playButton:(id)sender;
 - (IBAction)stopButton:(id)sender;
 - (IBAction)playPosition:(id)sender;
+- (IBAction)fileOpen:(id)sender;
 @end

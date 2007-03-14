@@ -2,11 +2,21 @@
     IBClasses = (
         {CLASS = BarGrapher; LANGUAGE = ObjC; SUPERCLASS = Grapher; }, 
         {
-            ACTIONS = {pauseButton = id; playButton = id; playPosition = id; stopButton = id; }; 
+            ACTIONS = {
+                fileOpen = id; 
+                pauseButton = id; 
+                playButton = id; 
+                playPosition = id; 
+                stopButton = id; 
+            }; 
             CLASS = Controller; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 fileDisplay = NSTextField; 
+                fileMenu = NSMenu; 
+                filePause = NSMenuItem; 
+                filePlay = NSMenuItem; 
+                fileStop = NSMenuItem; 
                 leftSpectrumGraph = BarGrapher; 
                 mainWindow = NSWindow; 
                 pauseButton = NSButton; 

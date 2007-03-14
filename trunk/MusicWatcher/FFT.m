@@ -14,7 +14,7 @@
 #import "FFT.h"
 
 //even the low pass filter isn't working right! this is really filtering at 10k
-#define LOW_PASS_FILTER 20000
+#define LOW_PASS_FILTER 0
 
 void makeMagnitudes(float*, float*, int, float*, int);
 float solveOneA(float);
@@ -90,7 +90,8 @@ float solveOneA(float);
 -(float *)doEasyFFT:(float [])PCM size:(int)size {
 	//why doesn't the apple suplied example work?
 	//float scale = (float)1.0/(2*fftSize);
-	float scale = (float)1.0/(4*fftSizeDamnApple);
+	float scale = (float)1/(4*fftSizeDamnApple);
+	int offset = 0;
 	int i;
 	
 	if (size != fftSize) {
@@ -102,7 +103,8 @@ float solveOneA(float);
 	
 	//FIXME - this might be the problem, should we really increment by 2?
 	for(i = 0; i < fftSize; i += 2) {
-		originalReal[i] = PCM[i];
+		originalReal[i] = PCM[offset];
+		offset++;
 	}
 	
 	//NSLog(@"here %i", borked++);
@@ -175,20 +177,22 @@ float solveOneA(float);
 
 void makeMagnitudes(float* answer, float* result, int size, float* freqs, int lowPassFilter) {
 	int i;
+	int answerOffset = 0;
 	
 	//FIXME - again, should we really increment by 2?
 	for(i = 0; i < size; i += 2) {
 		double oneResult;
 		float freq = freqs[i];
 		
-		if (freq > lowPassFilter) {
+		if (lowPassFilter && freq > lowPassFilter) {
 			break;
 		}
 		
 		
 		oneResult = sqrt((result[i] * result[i]) + (result[i + 1] * result[i + 1]));
 		
-		answer[i] = oneResult;
+		answer[answerOffset] = oneResult;
+		answerOffset++;
 	}
 }
 

@@ -133,12 +133,12 @@
 					PBXFileDataSource_Warnings_ColumnID,
 				);
 			};
-			PBXPerProjectTemplateStateSaveDate = 195505536;
-			PBXWorkspaceStateSaveDate = 195505536;
+			PBXPerProjectTemplateStateSaveDate = 195543485;
+			PBXWorkspaceStateSaveDate = 195543485;
 		};
 		perUserProjectItems = {
-			2F205D9E0BA765E400F9CB92 /* PBXTextBookmark */ = 2F205D9E0BA765E400F9CB92 /* PBXTextBookmark */;
-			2F205D9F0BA765E400F9CB92 /* PBXTextBookmark */ = 2F205D9F0BA765E400F9CB92 /* PBXTextBookmark */;
+			2FFAA0820BA7BEA50094F065 = 2FFAA0820BA7BEA50094F065 /* PBXBookmark */;
+			2FFAA08C0BA7C11B0094F065 = 2FFAA08C0BA7C11B0094F065 /* PBXTextBookmark */;
 		};
 		sourceControlManager = 2F4AC6630B94DC3900C552AD /* Source Control */;
 		userBuildSettings = {
@@ -151,24 +151,6 @@
 			sepNavVisRect = "{{0, 0}, {1057, 749}}";
 			sepNavWindowFrame = "{{53, -5}, {1102, 878}}";
 		};
-	};
-	2F205D9E0BA765E400F9CB92 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		comments = "error: incompatible types in initialization";
-		fRef = 2F61BE5C0B95371100A9AF00 /* BarGrapher.m */;
-		rLen = 1;
-		rLoc = 33;
-		rType = 1;
-	};
-	2F205D9F0BA765E400F9CB92 /* PBXTextBookmark */ = {
-		isa = PBXTextBookmark;
-		fRef = 2F61BE5C0B95371100A9AF00 /* BarGrapher.m */;
-		name = "BarGrapher.m: 34";
-		rLen = 0;
-		rLoc = 569;
-		rType = 0;
-		vrLen = 286;
-		vrLoc = 459;
 	};
 	2F3198DC0B96A21B0037E785 /* FFTEngine.h */ = {
 		uiCtxt = {
@@ -222,17 +204,17 @@
 	2F4AC6650B94DCFA00C552AD /* Controller.h */ = {
 		uiCtxt = {
 			sepNavIntBoundsRect = "{{0, 0}, {1057, 749}}";
-			sepNavSelRange = "{211, 0}";
+			sepNavSelRange = "{1040, 0}";
 			sepNavVisRect = "{{0, 0}, {1057, 749}}";
 			sepNavWindowFrame = "{{97, 0}, {1102, 878}}";
 		};
 	};
 	2F4AC6660B94DCFA00C552AD /* Controller.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1057, 3948}}";
-			sepNavSelRange = "{2250, 0}";
-			sepNavVisRect = "{{0, 1070}, {1057, 749}}";
-			sepNavWindowFrame = "{{189, 0}, {1102, 878}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1057, 4746}}";
+			sepNavSelRange = "{5849, 0}";
+			sepNavVisRect = "{{0, 3577}, {1057, 749}}";
+			sepNavWindowFrame = "{{191, 0}, {1102, 878}}";
 		};
 	};
 	2F4AC6A40B94E23600C552AD /* QTSoundFilePlayer.h */ = {
@@ -339,16 +321,38 @@
 	};
 	2F86E09A0B967BB400404515 /* FFT.m */ = {
 		uiCtxt = {
-			sepNavIntBoundsRect = "{{0, 0}, {1057, 2884}}";
-			sepNavSelRange = "{3111, 0}";
-			sepNavVisRect = "{{0, 1121}, {1057, 749}}";
-			sepNavWindowFrame = "{{189, 0}, {1102, 878}}";
+			sepNavIntBoundsRect = "{{0, 0}, {1057, 2940}}";
+			sepNavSelRange = "{2080, 0}";
+			sepNavVisRect = "{{0, 0}, {1057, 749}}";
+			sepNavWindowFrame = "{{184, 0}, {1102, 878}}";
 		};
+	};
+	2FFAA0820BA7BEA50094F065 /* PBXBookmark */ = {
+		isa = PBXBookmark;
+		fRef = 2F4AC6660B94DCFA00C552AD /* Controller.m */;
+	};
+	2FFAA08C0BA7C11B0094F065 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 2F4AC6660B94DCFA00C552AD /* Controller.m */;
+		name = "Controller.m: 292";
+		rLen = 0;
+		rLoc = 6596;
+		rType = 0;
+		vrLen = 1152;
+		vrLoc = 5494;
 	};
 	8D1107260486CEB800E47090 /* MusicWatcher */ = {
 		activeExec = 0;
 		executables = (
 			2F4AC65C0B94DC2D00C552AD /* MusicWatcher */,
 		);
+	};
+	8D1107310486CEB800E47090 /* Info.plist */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1057, 749}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRect = "{{0, 0}, {1057, 749}}";
+			sepNavWindowFrame = "{{53, -5}, {1102, 878}}";
+		};
 	};
 }
