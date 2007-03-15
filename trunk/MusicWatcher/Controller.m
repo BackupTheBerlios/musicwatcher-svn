@@ -79,6 +79,11 @@ float* mean(float **, int, int);
 	[ourPlayer setPlaybackPosition:[sender floatValue]];
 }
 
+- (IBAction)homePageAction:(id)sender
+{
+	NSURL* homePage = [NSURL URLWithString:@"http://musicwatcher.berlios.de/"];
+	[[NSWorkspace sharedWorkspace] openURL:homePage];
+}
 
 //timers
 - (void)updateUI:(NSTimer *)theTimer {	

@@ -40,4 +40,6 @@
 - (IBAction)stopButton:(id)sender;
 - (IBAction)playPosition:(id)sender;
 - (IBAction)fileOpen:(id)sender;
+- (IBAction)homePageAction:(id)sender;
+
 @end

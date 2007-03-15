@@ -4,6 +4,7 @@
         {
             ACTIONS = {
                 fileOpen = id; 
+                homePageAction = id; 
                 pauseButton = id; 
                 playButton = id; 
                 playPosition = id; 
